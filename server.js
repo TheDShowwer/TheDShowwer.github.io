@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 require('dotenv').config();
-const fetch = require('node-fetch');
+const axios = require('axios');
 
 const app = express();
 const port = 3000;
@@ -15,24 +15,24 @@ app.get('/api/player/:platform/:name', async (req, res) => {
 
   try {
     // Fetch player data using Bungie API
-    const response = await fetch(`https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayer/${platform}/${name}/`, {
+    const response = await axios.get(`https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayer/${platform}/${name}/`, {
       headers: {
         'X-API-Key': apiKey
       }
     });
-    const data = await response.json();
+    const data = response.data;
 
     if (data.Response && data.Response.length > 0) {
       const membershipId = data.Response[0].membershipId;
       const destinyMembershipId = data.Response[0].membershipId;
 
       // Fetch player profile data using membershipId and destinyMembershipId
-      const profileResponse = await fetch(`https://www.bungie.net/Platform/Destiny2/${membershipId}/Profile/${destinyMembershipId}/?components=100`, {
+      const profileResponse = await axios.get(`https://www.bungie.net/Platform/Destiny2/${membershipId}/Profile/${destinyMembershipId}/?components=100`, {
         headers: {
           'X-API-Key': apiKey
         }
       });
-      const profileData = await profileResponse.json();
+      const profileData = profileResponse.data;
 
       if (profileData.Response) {
         const profile = profileData.Response.profile.data;
@@ -44,12 +44,12 @@ app.get('/api/player/:platform/:name', async (req, res) => {
         const lightLevel = profile.light;
 
         // Fetch most used weapons/armor
-        const itemsResponse = await fetch(`https://www.bungie.net/Platform/Destiny2/${membershipId}/Profile/${destinyMembershipId}/?components=102`, {
+        const itemsResponse = await axios.get(`https://www.bungie.net/Platform/Destiny2/${membershipId}/Profile/${destinyMembershipId}/?components=102`, {
           headers: {
             'X-API-Key': apiKey
           }
         });
-        const itemsData = await itemsResponse.json();
+        const itemsData = itemsResponse.data;
 
         if (itemsData.Response) {
           const items = itemsData.Response.profileInventory.data.items;
@@ -78,4 +78,3 @@ app.get('/api/player/:platform/:name', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
