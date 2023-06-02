@@ -1,51 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Destiny Usage</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destiny Usage</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-  <header>
-    <div class="logo">
-      <img src="lightfall_logo.png" alt="Logo">
-      <span>Destiny Usage</span>
+    <div class="container">
+        <h1>Destiny Usage</h1>
+        <form id="search-form">
+            <div class="form-group">
+                <label for="platform">Platform:</label>
+                <select id="platform" name="platform">
+                    <option value="1">Xbox</option>
+                    <option value="2">PlayStation</option>
+                    <option value="3">Steam</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="player-name">Player Name:</label>
+                <input type="text" id="player-name" name="player-name" placeholder="Enter player name">
+            </div>
+            <button type="submit" class="search-button">Search</button>
+        </form>
+        <div id="results"></div>
     </div>
-  </header>
 
-  <main>
-    <h1>Search Destiny Player</h1>
-    <p class="description">Welcome to Destiny Usage, a website that provides insights into player stats and usage data for Destiny 2. Simply search for a player and explore their most used weapons and armor.</p>
-    <form id="search-form">
-      <div class="form-group">
-        <label for="platform">Platform:</label>
-        <select id="platform" name="platform">
-          <option value="1">Xbox</option>
-          <option value="2">PlayStation</option>
-          <option value="3">Steam</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-      </div>
-      <button type="submit" class="search-button">Search</button>
-    </form>
-
-    <div id="result-container" class="hidden">
-      <h2>Player Details</h2>
-      <div id="player-details"></div>
-      <h2>Most Used Weapons</h2>
-      <div id="weapons-list"></div>
-      <h2>Most Used Armor</h2>
-      <div id="armor-list"></div>
-    </div>
-  </main>
-
-  <script src="main.js"></script>
+    <script src="main.js"></script>
 </body>
-
 </html>
