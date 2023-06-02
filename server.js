@@ -8,8 +8,9 @@ const port = 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Serve the HTML file for the root URL
 app.get('/', (req, res) => {
-  res.send('Welcome to the Destiny 2 Usage Tracker!');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.get('/api/player/:platform/:name', async (req, res) => {
@@ -79,6 +80,7 @@ app.get('/api/player/:platform/:name', async (req, res) => {
   }
 });
 
+// Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
