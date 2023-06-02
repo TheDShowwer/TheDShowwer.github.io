@@ -5,43 +5,111 @@ require('dotenv').config();
 const app = express();
 const port = 3000;
 
+// Middleware to parse JSON bodies
 app.use(express.json());
 
-app.post('/player', async (req, res) => {
+// Bungie API key
+const apiKey = process.env.BUNGIE_API_KEY;
+
+// Endpoint to retrieve player information
+app.get('/player/:bungieName', async (req, res) => {
   try {
-    const bungieName = req.body.bungieName;
-    const apiKey = process.env.BUNGIE_API_KEY;
-    const searchUrl = 'https://www.bungie.net/Platform/User/SearchUsers/';
-    const searchParams = {
-      search: bungieName
-    };
-
-    const response = await axios.post(searchUrl, searchParams, {
-      headers: {
-        'X-API-Key': apiKey,
-        'Content-Type': 'application/json'
+    const bungieName = req.params.bungieName;
+    
+    // Get Destiny Membership ID
+    const membershipIdResponse = await axios.get(
+      `https://www.bungie.net/Platform/User/SearchUsers?q=${bungieName}`,
+      {
+        headers: {
+          'X-API-Key': apiKey
+        }
       }
-    });
-
-    // Assuming the first profile in the response is the desired player
-    const playerProfile = response.data.Response[0];
-
-    // Get the Destiny membership ID and membership type
-    const destinyMembershipId = playerProfile.membershipId;
-    const membershipType = playerProfile.membershipType;
-
-    res.json({
-      destinyMembershipId,
-      membershipType
-    });
+    );
+    
+    const destinyMembershipId = membershipIdResponse.data.Response[0].membershipId;
+    const membershipType = membershipIdResponse.data.Response[0].membershipType;
+    
+    // Get Player Profile
+    const profileResponse = await axios.get(
+      `https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${destinyMembershipId}/`,
+      {
+        headers: {
+          'X-API-Key': apiKey
+        }
+      }
+    );
+    
+    const characterIds = profileResponse.data.Response.profile.data.characterIds;
+    
+    // Get Character Information
+    const characterInfoResponse = await axios.get(
+      `https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${destinyMembershipId}/Character/${characterIds[0]}/`,
+      {
+        headers: {
+          'X-API-Key': apiKey
+        }
+      }
+    );
+    
+    const characterData = characterInfoResponse.data.Response.character.data;
+    const emblemPath = characterData.emblemPath;
+    const light = characterData.light;
+    const race = characterData.raceType;
+    const playerClass = characterData.classType;
+    
+    // Get Most Used Guns
+    const mostUsedGunsResponse = await axios.get(
+      `https://www.bungie.net/Platform/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/Weapons/`,
+      {
+        headers: {
+          'X-API-Key': apiKey
+        }
+      }
+    );
+    
+    const mostUsedGuns = mostUsedGunsResponse.data.Response.mergedAllCharacters.results
+      .filter(result => result.values.uniqueWeaponKills.basic.value > 0)
+      .map(result => ({
+        name: result.weaponName,
+        kills: result.values.uniqueWeaponKills.basic.value
+      }));
+    
+    // Get Most Used Armor with Rarity Filter
+    const mostUsedArmorResponse = await axios.get(
+      `https://www.bungie.net/Platform/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/AggregateActivityStats/`,
+      {
+        headers: {
+          'X-API-Key': apiKey
+        }
+      }
+    );
+    
+    const mostUsedArmor = mostUsedArmorResponse.data.Response.activities
+      .filter(activity => activity.values.uniqueWeaponKills.basic.value > 0 && activity.values.uniqueWeaponKills.basic.displayValue.includes('Rare'))
+      .map(activity => ({
+        name: activity.activityDetails.referenceId,
+        kills: activity.values.uniqueWeaponKills.basic.value
+      }));
+    
+    const playerInfo = {
+      emblemPath,
+      light,
+      race,
+      playerClass,
+      mostUsedGuns,
+      mostUsedArmor
+    };
+    
+    res.json(playerInfo);
   } catch (error) {
-    console.log('Error:', error.response.data);
-    res.status(500).json({ error: 'Failed to retrieve player membership ID' });
+    console.error(error);
+    res.status(500).send('Internal Server Error');
   }
 });
 
+// Start the server
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
 
 
