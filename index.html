@@ -1,29 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Destiny Usage</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destiny Usage</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <h1>Destiny Usage</h1>
-  </header>
-  <main>
-    <div class="search-container">
-      <label for="platform-select">Platform:</label>
-      <select id="platform-select">
-        <option value="1">Xbox</option>
-        <option value="2">PlayStation</option>
-        <option value="3">Steam</option>
-      </select>
-      <input type="text" id="player-input" placeholder="Enter Bungie.net username">
-      <button id="search-button">Search</button>
+    <div class="container">
+        <h1>Destiny Usage</h1>
+        <form id="search-form">
+            <div class="form-group">
+                <label for="platform">Platform:</label>
+                <select id="platform" name="platform">
+                    <option value="1">Xbox</option>
+                    <option value="2">PlayStation</option>
+                    <option value="3">Steam</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="player-name">Player Name:</label>
+                <input type="text" id="player-name" name="player-name" placeholder="Enter player name">
+            </div>
+            <button type="submit" class="search-button">Search</button>
+        </form>
+        <div id="results"></div>
     </div>
-    <div id="result-container"></div>
-  </main>
-  <script src="main.js"></script>
+
+    <script src="main.js"></script>
 </body>
 </html>
 
