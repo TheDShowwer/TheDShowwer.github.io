@@ -60,7 +60,7 @@ app.get('/api/player/:platform/:id', async (req, res) => {
       res.status(404).json({ error: 'Player profile not found' });
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error:', error.response?.data || error.message);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -69,3 +69,4 @@ app.get('/api/player/:platform/:id', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
