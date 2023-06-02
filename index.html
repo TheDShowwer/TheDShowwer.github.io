@@ -1,45 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Destiny Usage</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
   <header>
     <h1>Destiny Usage</h1>
   </header>
   <main>
-    <section id="search-section">
-      <h2>Search Player</h2>
-      <form id="search-form">
-        <div>
-          <input type="text" id="search-input" placeholder="Enter Bungie Name" required>
-        </div>
-        <div>
-          <select id="platform-select" required>
-            <option value="" disabled selected>Select Platform</option>
-            <option value="1">PlayStation</option>
-            <option value="2">Xbox</option>
-            <option value="3">Steam</option>
-            <option value="4">Battle.net</option>
-            <option value="5">Stadia</option>
-          </select>
-        </div>
-        <div>
-          <button type="submit">Search</button>
-        </div>
-      </form>
-    </section>
-    <section id="result-section">
-      <div id="result-container"></div>
-    </section>
+    <div class="search-container">
+      <label for="platform-select">Platform:</label>
+      <select id="platform-select">
+        <option value="1">Xbox</option>
+        <option value="2">PlayStation</option>
+        <option value="3">Steam</option>
+      </select>
+      <input type="text" id="player-input" placeholder="Enter Bungie.net username">
+      <button id="search-button">Search</button>
+    </div>
+    <div id="result-container"></div>
   </main>
   <script src="main.js"></script>
 </body>
-
 </html>
+
 
