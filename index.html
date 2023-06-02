@@ -1,79 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Destiny Usage</title>
-  <style>
-    body {
-      background-color: #333;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
-
-    h1 {
-      text-align: center;
-    }
-
-    /* Search section */
-    #search-section {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    #search-input {
-      padding: 10px;
-      border: none;
-      background-color: #444;
-      color: #fff;
-      font-size: 16px;
-    }
-
-    #search-btn {
-      padding: 10px 20px;
-      border: none;
-      background-color: yellow;
-      color: #000;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    /* Player info section */
-    #player-info {
-      text-align: center;
-    }
-
-    #player-name {
-      margin-top: 30px;
-    }
-
-    #player-emblem,
-    #player-emblem-background {
-      width: 100px;
-      height: 100px;
-      margin: 20px;
-    }
-
-    #character-details {
-      margin-top: 30px;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-  <h1>Destiny Usage</h1>
-  
-  <div id="search-section">
-    <input type="text" id="search-input" placeholder="Enter Bungie.net Membership ID">
-    <button id="search-btn">Search</button>
-  </div>
-  
-  <div id="player-info">
-    <h2 id="player-name"></h2>
-    <img id="player-emblem" src="" alt="Player Emblem">
-    <img id="player-emblem-background" src="" alt="Player Emblem Background">
-    
-    <div id="character-details"></div>
-  </div>
-  
+  <header>
+    <h1>Destiny Usage</h1>
+  </header>
+  <main>
+    <section id="search-section">
+      <h2>Search Player</h2>
+      <form id="search-form">
+        <div>
+          <input type="text" id="search-input" placeholder="Enter Bungie Name" required>
+        </div>
+        <div>
+          <select id="platform-select" required>
+            <option value="" disabled selected>Select Platform</option>
+            <option value="1">PlayStation</option>
+            <option value="2">Xbox</option>
+            <option value="3">Steam</option>
+            <option value="4">Battle.net</option>
+            <option value="5">Stadia</option>
+          </select>
+        </div>
+        <div>
+          <button type="submit">Search</button>
+        </div>
+      </form>
+    </section>
+    <section id="result-section">
+      <div id="result-container"></div>
+    </section>
+  </main>
   <script src="main.js"></script>
 </body>
+
 </html>
+
