@@ -1,115 +1,73 @@
 const express = require('express');
-const axios = require('axios');
+const path = require('path');
 require('dotenv').config();
+const axios = require('axios');
 
 const app = express();
 const port = 3000;
 
-// Middleware to parse JSON bodies
-app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Bungie API key
-const apiKey = process.env.BUNGIE_API_KEY;
+// Serve the HTML file for the root URL
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
-// Endpoint to retrieve player information
-app.get('/player/:bungieName', async (req, res) => {
+app.get('/api/player/:platform/:id', async (req, res) => {
+  const platform = req.params.platform;
+  const id = req.params.id;
+  const apiKey = process.env.BUNGIE_API_KEY;
+
   try {
-    const bungieName = req.params.bungieName;
+    // Fetch player data using Bungie API
+    const response = await axios.get(`https://www.bungie.net/Platform/Destiny2/${platform}/Profile/${id}/?components=100`, {
+      headers: {
+        'X-API-Key': apiKey
+      }
+    });
+    const data = response.data;
 
-    // Get Destiny Membership ID
-    const membershipIdResponse = await axios.get(
-      `https://www.bungie.net/Platform/User/SearchUsers?q=${bungieName}`,
-      {
+    if (data.Response) {
+      const profile = data.Response.profile.data;
+
+      // Extract necessary data from the profile
+      const emblem = profile.emblemPath;
+      const classType = profile.classType;
+      const race = profile.raceType;
+      const lightLevel = profile.light;
+
+      // Fetch most used weapons/armor
+      const itemsResponse = await axios.get(`https://www.bungie.net/Platform/Destiny2/${platform}/Profile/${id}/?components=102`, {
         headers: {
           'X-API-Key': apiKey
         }
+      });
+      const itemsData = itemsResponse.data;
+
+      if (itemsData.Response) {
+        const items = itemsData.Response.profileInventory.data.items;
+
+        // Filter items by rarity
+        const rarityFilter = req.query.rarity; // Expects a query parameter named 'rarity'
+        const filteredItems = items.filter(item => item.itemTypeAndTierDisplayName.toLowerCase().includes(rarityFilter));
+
+        // Return the player data and filtered items as JSON
+        res.json({ emblem, classType, race, lightLevel, filteredItems });
+      } else {
+        res.status(404).json({ error: 'Player items not found' });
       }
-    );
-
-    const destinyMembershipId = membershipIdResponse.data.Response[0].membershipId;
-    const membershipType = membershipIdResponse.data.Response[0].membershipType;
-
-    // Get Player Profile
-    const profileResponse = await axios.get(
-      `https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${destinyMembershipId}/`,
-      {
-        headers: {
-          'X-API-Key': apiKey
-        }
-      }
-    );
-
-    const characterIds = profileResponse.data.Response.profile.data.characterIds;
-
-    // Get Character Information
-    const characterInfoResponse = await axios.get(
-      `https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${destinyMembershipId}/Character/${characterIds[0]}/`,
-      {
-        headers: {
-          'X-API-Key': apiKey
-        }
-      }
-    );
-
-    const characterData = characterInfoResponse.data.Response.character.data;
-    const emblemPath = characterData.emblemPath;
-    const light = characterData.light;
-    const race = characterData.raceType;
-    const playerClass = characterData.classType;
-
-    // Get Most Used Guns
-    const mostUsedGunsResponse = await axios.get(
-      `https://www.bungie.net/Platform/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/Weapons/`,
-      {
-        headers: {
-          'X-API-Key': apiKey
-        }
-      }
-    );
-
-    const mostUsedGuns = mostUsedGunsResponse.data.Response.mergedAllCharacters.results
-      .filter(result => result.values.uniqueWeaponKills.basic.value > 0)
-      .map(result => ({
-        name: result.weaponName,
-        kills: result.values.uniqueWeaponKills.basic.value
-      }));
-
-    // Get Most Used Armor with Rarity Filter
-    const mostUsedArmorResponse = await axios.get(
-      `https://www.bungie.net/Platform/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/AggregateActivityStats/`,
-      {
-        headers: {
-          'X-API-Key': apiKey
-        }
-      }
-    );
-
-    const mostUsedArmor = mostUsedArmorResponse.data.Response.activities
-      .filter(activity => activity.values.uniqueWeaponKills.basic.value > 0 && activity.values.uniqueWeaponKills.basic.displayValue.includes('Rare'))
-      .map(activity => ({
-        name: activity.activityDetails.referenceId,
-        kills: activity.values.uniqueWeaponKills.basic.value
-      }));
-
-    const playerInfo = {
-      emblemPath,
-      light,
-      race,
-      playerClass,
-      mostUsedGuns,
-      mostUsedArmor
-    };
-
-    res.json(playerInfo);
+    } else {
+      res.status(404).json({ error: 'Player profile not found' });
+    }
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
 
 
