@@ -8,6 +8,10 @@ const port = 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/', (req, res) => {
+  res.send('Welcome to the Destiny 2 Usage Tracker!');
+});
+
 app.get('/api/player/:platform/:name', async (req, res) => {
   const platform = req.params.platform;
   const name = req.params.name;
