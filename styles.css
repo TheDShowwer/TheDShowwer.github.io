@@ -18,11 +18,12 @@ body {
 .logo {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    justify-content: center;
+    margin-bottom: 30px;
 }
 
 .logo img {
-    max-width: 100px;
+    max-width: 250px;
     height: auto;
 }
 
