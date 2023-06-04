@@ -20,44 +20,57 @@ app.get('/api/player/:platform/:id', async (req, res) => {
 
   try {
     // Fetch player data using Bungie API
-    const response = await axios.get(`https://www.bungie.net/Platform/Destiny2/${platform}/Profile/${id}/?components=100`, {
+    const response = await axios.get(`https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayer/${platform}/${id}/`, {
       headers: {
         'X-API-Key': apiKey
       }
     });
     const data = response.data;
 
-    if (data.Response) {
-      const profile = data.Response.profile.data;
+    if (data.Response.length > 0) {
+      const membershipId = data.Response[0].membershipId;
 
-      // Extract necessary data from the profile
-      const emblem = profile.emblemPath;
-      const classType = profile.classType;
-      const race = profile.raceType;
-      const lightLevel = profile.light;
-
-      // Fetch most used weapons/armor
-      const itemsResponse = await axios.get(`https://www.bungie.net/Platform/Destiny2/${platform}/Profile/${id}/?components=102`, {
+      const profileResponse = await axios.get(`https://www.bungie.net/Platform/Destiny2/${platform}/Profile/${membershipId}/?components=100`, {
         headers: {
           'X-API-Key': apiKey
         }
       });
-      const itemsData = itemsResponse.data;
+      const profileData = profileResponse.data;
 
-      if (itemsData.Response) {
-        const items = itemsData.Response.characterEquipment.data.items;
+      if (profileData.Response) {
+        const profile = profileData.Response.profile.data;
 
-        // Filter items by rarity
-        const rarityFilter = req.query.rarity; // Expects a query parameter named 'rarity'
-        const filteredItems = items.filter(item => item.itemTypeAndTierDisplayName.toLowerCase().includes(rarityFilter));
+        // Extract necessary data from the profile
+        const emblem = profile.emblemPath;
+        const classType = profile.classType;
+        const race = profile.raceType;
+        const lightLevel = profile.light;
 
-        // Return the player data and filtered items as JSON
-        res.json({ emblem, classType, race, lightLevel, filteredItems });
+        // Fetch most used weapons/armor
+        const itemsResponse = await axios.get(`https://www.bungie.net/Platform/Destiny2/${platform}/Profile/${membershipId}/?components=102`, {
+          headers: {
+            'X-API-Key': apiKey
+          }
+        });
+        const itemsData = itemsResponse.data;
+
+        if (itemsData.Response) {
+          const items = itemsData.Response.characterEquipment.data.items;
+
+          // Filter items by rarity
+          const rarityFilter = req.query.rarity; // Expects a query parameter named 'rarity'
+          const filteredItems = rarityFilter ? items.filter(item => item.itemTypeAndTierDisplayName.toLowerCase().includes(rarityFilter)) : items;
+
+          // Return the player data and filtered items as JSON
+          res.json({ emblem, classType, race, lightLevel, filteredItems });
+        } else {
+          res.status(404).json({ error: 'Player items not found' });
+        }
       } else {
-        res.status(404).json({ error: 'Player items not found' });
+        res.status(404).json({ error: 'Player profile not found' });
       }
     } else {
-      res.status(404).json({ error: 'Player profile not found' });
+      res.status(404).json({ error: 'Player not found' });
     }
   } catch (error) {
     console.error('Error:', error);
@@ -80,7 +93,6 @@ app.use((req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
 
 
 
