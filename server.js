@@ -45,7 +45,7 @@ app.get('/api/player/:platform/:id', async (req, res) => {
       const itemsData = itemsResponse.data;
 
       if (itemsData.Response) {
-        const items = itemsData.Response.profileInventory.data.items;
+        const items = itemsData.Response.characterEquipment.data.items;
 
         // Filter items by rarity
         const rarityFilter = req.query.rarity; // Expects a query parameter named 'rarity'
