@@ -65,11 +65,21 @@ app.get('/api/player/:platform/:id', async (req, res) => {
   }
 });
 
+// Solution 2: Custom error handler middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ error: 'Server error' });
+});
+
+// Solution 3: 404 error handler middleware
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
 
 
 
