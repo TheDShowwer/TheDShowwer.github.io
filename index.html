@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Destiny Usage</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="logo.png" alt="Logo" width="250">
+    </div>
+    <h1>Destiny Usage</h1>
+    <div class="form-group">
+      <label for="bungieId">Bungie ID:</label>
+      <input type="text" id="bungieId" placeholder="Enter Bungie ID">
+    </div>
+    <div class="form-group">
+      <label for="platform">Platform:</label>
+      <select id="platform">
+        <option value="1">Xbox</option>
+        <option value="2">PlayStation</option>
+        <option value="3">Steam</option>
+        <!-- Add more platform options as needed -->
+      </select>
+    </div>
+    <button id="searchButton">Search</button>
+    <div id="resultsContainer"></div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+
+</html>
