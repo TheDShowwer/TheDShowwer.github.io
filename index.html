@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Destiny Usage</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="logo.png" alt="Logo" width="250">
+    </div>
+    <h1>Destiny Usage</h1>
+    <div class="form-group">
+      <label for="destinyMembershipId">Destiny Membership ID:</label>
+      <input type="text" id="destinyMembershipId" placeholder="Enter Destiny Membership ID">
+    </div>
+    <div class="form-group">
+      <label for="platform">Platform:</label>
+      <select id="platform">
+        <option value="1">Xbox</option>
+        <option value="2">PlayStation</option>
+        <option value="3">PC</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <button id="searchButton">Search</button>
+    </div>
+    <div id="resultsContainer"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    document.getElementById('searchButton').addEventListener('click', searchCharacters);
+
+    function searchCharacters() {
+      const destinyMembershipId = document.getElementById('destinyMembershipId').value;
+      const platform = document.getElementById('platform').value;
+
+      axios.get(`/characters?destinyMembershipId=${destinyMembershipId}&platform=${platform}`)
+        .then(response => {
+          displayCharacters(response.data.characters);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
+    function displayCharacters(characters) {
+      const resultsContainer = document.getElementById('resultsContainer');
+      resultsContainer.innerHTML = '';
+
+      if (Array.isArray(characters)) {
+        characters.forEach(character => {
+          const characterElement = document.createElement('div');
+          characterElement.innerHTML = `
+            <h2>${character.displayName}</h2>
+            <img src="https://www.bungie.net${character.emblemPath}" alt="Character Emblem">
+            <p>Light Level: ${character.light}</p>
+            <p>Race: ${character.raceType}</p>
+            <p>Class: ${character.classType}</p>
+            <p>Gender: ${character.genderType}</p>
+          `;
+
+          resultsContainer.appendChild(characterElement);
+        });
+      } else {
+        const errorElement = document.createElement('p');
+        errorElement.textContent = 'No characters found.';
+        resultsContainer.appendChild(errorElement);
+      }
+    }
+  </script>
+</body>
+
+</html>
